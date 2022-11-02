@@ -23,7 +23,6 @@ getlatestversion(){
         length := end - start
         output := Substr(api, start, length)
     } catch e {
-        notification("Could not find latest version. Check your internet connection.")
         Return False
     }
     Return %output%
