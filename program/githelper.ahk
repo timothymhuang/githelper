@@ -98,14 +98,15 @@ Loop
 ;
 
 checkupdate:
-api := getapi()
-newversion := getini(api,"version")
+newversion := getlatestversion()
+if !(newversion)
+    Return
 IniRead, currentversion, %A_ScriptDir%\config.ini, settings, version
 if (newversion != currentversion){
     error := false
     try
     {
-        UrlDownloadToFile, https://github.com/timothymhuang/api/blob/main/rocketry/githelperupdater.exe?raw=true, %A_ScriptDir%\githelperupdater.exe
+        UrlDownloadToFile, https://github.com/timothymhuang/githelper/releases/latest/download/githelperupdater.exe, %A_ScriptDir%\githelperupdater.exe
     } catch e {
         error := true
     }
@@ -196,6 +197,25 @@ log(text, override:=0){
 notification(text, options:=""){
     global reponame
     TrayTip, GitHelper in %reponame%, %text%,, options
+}
+
+getlatestversion(){
+    try {
+        whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        whr.Open("GET", "https://github.com/timothymhuang/githelper/releases/latest", true)
+        whr.SetRequestHeader("Pragma", "no-cache")
+        whr.SetRequestHeader("Cache-Control", "no-cache")
+        whr.Send()
+        whr.WaitForResponse()
+        api := whr.ResponseText
+        start := InStr(api, "Release v") + 9
+        end := InStr(api, " ",,start)
+        length := end - start
+        output := Substr(api, start, length)
+    } catch e {
+        Return False
+    }
+    Return %output%
 }
 
 getapi(){

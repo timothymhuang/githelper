@@ -87,7 +87,7 @@ getlatestversion(){
         whr.SetRequestHeader("Cache-Control", "no-cache")
         whr.Send()
         whr.WaitForResponse()
-        api := geturl " | " whr.ResponseText
+        api := whr.ResponseText
         start := InStr(api, "Release v") + 9
         end := InStr(api, " ",,start)
         length := end - start
