@@ -1,6 +1,15 @@
-﻿; BASIC STATUP TAGS
+﻿; BASIC STARTUP
 #NoEnv
 #SingleInstance, Force
+#Persistent
+
+; TRAY MENU
+Menu, Tray, NoStandard
+Menu, Tray, DeleteAll
+Menu, Tray, Add, Check For Update, checkupdate
+Menu, Tray, Add, Exit, exitapp
+
+; STARTUP SCRIPTS
 SendMode Input
 SetWorkingDir, %A_ScriptDir%
 log = 0 ; 0 = Error Logs, 1 = All Logs
@@ -34,7 +43,7 @@ orighead := localrepo . "\.git\ORIG_HEAD"
 updatetime()
 
 ; STARTUP NOTIFICATION
-notification("v" . currentversion . " started in " . localrepo)
+notification(currentversion . " started in " . localrepo)
 
 ; SCRIPT LOOP
 Loop
@@ -93,8 +102,8 @@ Loop
     Sleep, 5000
 }
 
-;
-; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; TAGS
 ;
 
 checkupdate:
@@ -117,8 +126,14 @@ if (newversion != currentversion){
 }
 Return
 
-;
-; ~~~~~~~~~~~~~~~~~
+exitapp:
+Exit
+Return
+
+
+
+; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; FUNCTIONS
 ;
 
 updatetime()
