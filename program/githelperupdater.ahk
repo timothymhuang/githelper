@@ -24,7 +24,7 @@ getlatestversion(){
         endForwardSlash := Instr(api, "/",,start)
         endQuote := Instr(api, "'",,start)
         endDoubleQuote := Instr(api, """",,start)
-        end := Min(endSpace, endPound, endForwardSlash, endBackSlash, endQuote, endDoubleQuote)
+        end := Min(endSpace, endPound, endForwardSlash, endQuote, endDoubleQuote)
         length := end - start
         output := Substr(api, start, length)
     } catch e {
