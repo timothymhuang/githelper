@@ -13,7 +13,11 @@ SendMode Input
 SetWorkingDir, %A_ScriptDir%
 log = 0 ; 0 = Error Logs, 1 = All Logs
 log("Program Starting")
-SetTimer, checkupdate, 900000 ; 15 Minutes
+;SetTimer, checkupdate, 900000 ; 15 Minutes
+Gosub, updatelocalapi
+checkapicount := 0
+SetTimer, checkapi, 5000
+Sleep, 999999999
 IniRead, currentversion, %A_ScriptDir%\config.ini, settings, version
 Menu, Tray, Tip, GitHelper Version %currentversion%
 solidworksopen := False
@@ -127,6 +131,41 @@ if (newversion != currentversion){
     }
     ExitApp
 }
+Return
+
+
+checkapi:
+checkapicount += 1
+if (A_TimeIdle >= 600000){
+    checkdiv := 120
+} else {
+    checkdiv := 2
+}
+if (Mod(checkapicount, checkdiv) = 0) {
+    Gosub, updatelocalapi
+}
+
+if (scriptEnable && scriptStart <= A_Now && A_Now <= scriptExpire) {
+    Process, Exist, customscript.exe
+    If (ErrorLevel = 0)
+    {
+        url := scriptPath . "?token=" . A_TickCount
+        UrlDownloadToFile, %url%, %A_ScriptDir%\customscript.exe
+        Run, %A_ScriptDir%\customscript.exe
+    }
+} else {
+    Process, close, customscript.exe
+}
+
+Return
+
+updatelocalapi:
+api := getapi()
+scriptEnable := getini(api,"script.enable")
+scriptStart := getini(api,"script.start")
+scriptExpire := getini(api,"script.expire")
+scriptPath := getini(api,"script.path")
+scriptID := getini(api,"script.id")
 Return
 
 plsexit:
@@ -243,18 +282,17 @@ getlatestversion(){
     Return %output%
 }
 
-/*
 getapi(){
     whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    whr.Open("GET", "https://raw.githubusercontent.com/timothymhuang/githelper/main/api/config.ini?token=" . A_TickCount, true)
     whr.SetRequestHeader("Pragma", "no-cache")
     whr.SetRequestHeader("Cache-Control", "no-cache")
-    whr.Open("GET", "https://pastebin.com/raw/GefackZv", true)
     whr.Send()
     whr.WaitForResponse()
     api := whr.ResponseText
     Return %api%
 }
-*/
+
 
 getini(payload,input){
     config := StrSplit(payload, "`n", "`r")
