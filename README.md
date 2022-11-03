@@ -14,7 +14,7 @@ This is just a small program I wrote to help my teammates with Git.
 	- Automatically checks for updates and downloads them (very important since there are many computers and I don't want to have to go around to each computer to update the software.
 
 ## Download Instructions
-**Remember: I would not follow these instructions since the program is hardcoded specifically for my team.** Just use this for reference if you want to modify the source code yourself.
+**:warning: Remember: I would not follow these instructions since the program is hardcoded specifically for my team.** Just use this for reference if you want to modify the source code yourself.
 
 1. Go to the [latest release](https://github.com/timothymhuang/githelper/releases/latest)
 2. Download GitHelper.Installer.Exe
