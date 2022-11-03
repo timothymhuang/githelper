@@ -18,16 +18,23 @@ getlatestversion(){
         whr.Send()
         whr.WaitForResponse()
         api := whr.ResponseText
-        start := InStr(api, "Release v") + 9
-        end := InStr(api, " ",,start)
+        start := InStr(api, "timothymhuang/githelper/releases/tag/") + 37
+        endSpace := InStr(api, " ",,start)
+        endPound := Instr(api, "#",,start)
+        endForwardSlash := Instr(api, "/",,start)
+        endBackSlash := Instr(api, "\",,start)
+        endQuote := Instr(api, "'",,start)
+        endDoubleQuote := Instr(api, """",,start)
+        end := Min(endSpace, endPound, endForwardSlash, endBackSlash, endQuote, endDoubleQuote)
         length := end - start
         output := Substr(api, start, length)
     } catch e {
-        Return False
+        Return "ERROR"
     }
     Return %output%
 }
 
+/*
 getapi(){
     whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     whr.Open("GET", "https://raw.githubusercontent.com/timothymhuang/api/main/rocketry/githelper.ini", true)
@@ -36,6 +43,7 @@ getapi(){
     api := whr.ResponseText
     Return %api%
 }
+*/
 
 getini(payload,input){
     config := StrSplit(payload, "`n")
