@@ -2,8 +2,6 @@
 #NoEnv
 #SingleInstance, Force
 
-Msgbox % getlatestversion()
-
 ; TRAY MENU
 Menu, Tray, NoStandard
 Menu, Tray, DeleteAll
