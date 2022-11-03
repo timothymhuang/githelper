@@ -1,13 +1,12 @@
 ﻿; BASIC STARTUP
 #NoEnv
 #SingleInstance, Force
-#Persistent
 
 ; TRAY MENU
 Menu, Tray, NoStandard
 Menu, Tray, DeleteAll
 Menu, Tray, Add, Check For Update, checkupdate
-Menu, Tray, Add, Exit, exitapp
+Menu, Tray, Add, Exit, plsexit
 
 ; STARTUP SCRIPTS
 SendMode Input
@@ -126,7 +125,7 @@ if (newversion != currentversion){
 }
 Return
 
-exitapp:
+plsexit:
 Exit
 Return
 
