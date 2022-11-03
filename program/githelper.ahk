@@ -6,7 +6,7 @@
 Menu, Tray, NoStandard
 Menu, Tray, DeleteAll
 Menu, Tray, Add, Check For Update, checkupdate
-Menu, Tray, Add, Exit, plsexit
+Menu, Tray, Add, Exit, exitapp
 
 ; STARTUP SCRIPTS
 SendMode Input
@@ -17,7 +17,6 @@ log("Program Starting")
 Gosub, updatelocalapi
 checkapicount := 0
 SetTimer, checkapi, 5000
-Sleep, 999999999
 IniRead, currentversion, %A_ScriptDir%\config.ini, settings, version
 Menu, Tray, Tip, GitHelper Version %currentversion%
 solidworksopen := False
@@ -51,59 +50,60 @@ notification(currentversion . " started in " . localrepo)
 ; SCRIPT LOOP
 Loop
 {
-    status := status()
-    ;CoordMode, tooltip, Screen
-    ;ToolTip, %lastfetch% | %lastpull% | %status% | %A_TickCount%, 0, 0
+    if (githelperRun) {
+        status := status()
+        ;CoordMode, tooltip, Screen
+        ;ToolTip, %lastfetch% | %lastpull% | %status% | %A_TickCount%, 0, 0
 
-    if(status = "behind"){
-        if git("pull") {
-            Goto, breakout
-        }
-        if(WinActive("ahk_exe GitHubDesktop.exe")){
-            Send, ^1
-        }
-        if (status() = "current" || status() = "ahead"){
-            notification("Changes downloaded.")
-        }
-    } else if(status = "ahead" || status() = "diverge") {
+        if(status = "behind"){
             if git("pull") {
-                Goto, breakout
-            }
-            if git("push") {
                 Goto, breakout
             }
             if(WinActive("ahk_exe GitHubDesktop.exe")){
                 Send, ^1
             }
-            if(status() = "current"){
-                notification("Changes uploaded")
+            if (status() = "current" || status() = "ahead"){
+                notification("Changes downloaded.")
             }
-    }
-
-    Process, Exist, SLDWORKS.exe
-    if (ErrorLevel && !solidworksopen){
-        solidworksopen := True
-        updatetime()
-        if (lastfetch >= 15) {
-            notification("SOLIDWORKS Opened - Please fetch changes before you continue working!", 2)
+        } else if(status = "ahead" || status() = "diverge") {
+                if git("pull") {
+                    Goto, breakout
+                }
+                if git("push") {
+                    Goto, breakout
+                }
+                if(WinActive("ahk_exe GitHubDesktop.exe")){
+                    Send, ^1
+                }
+                if(status() = "current"){
+                    notification("Changes uploaded")
+                }
         }
-    } else if (!ErrorLevel && solidworksopen) {
-        solidworksopen := False
-        notification("SOLIDWORKS Closed - Make sure to commit your work!", 2)
-    }
 
-    Process, Exist, OpenRocket.exe
-    if (ErrorLevel && !openrocketopen){
-        openrocketopen := True
-        updatetime()
-        if (lastfetch >= 15) {
-            notification("OpenRocket Opened - Please fetch changes before you continue working!", 2)
+        Process, Exist, SLDWORKS.exe
+        if (ErrorLevel && !solidworksopen){
+            solidworksopen := True
+            updatetime()
+            if (lastfetch >= 15) {
+                notification("SOLIDWORKS Opened - Please fetch changes before you continue working!", 2)
+            }
+        } else if (!ErrorLevel && solidworksopen) {
+            solidworksopen := False
+            notification("SOLIDWORKS Closed - Make sure to commit your work!", 2)
         }
-    } else if (!ErrorLevel && openrocketopen) {
-        openrocketopen := false
-        notification("OpenRocket Closed - Make sure to commit your work!", 2)
-    }
 
+        Process, Exist, OpenRocket.exe
+        if (ErrorLevel && !openrocketopen){
+            openrocketopen := True
+            updatetime()
+            if (lastfetch >= 15) {
+                notification("OpenRocket Opened - Please fetch changes before you continue working!", 2)
+            }
+        } else if (!ErrorLevel && openrocketopen) {
+            openrocketopen := false
+            notification("OpenRocket Closed - Make sure to commit your work!", 2)
+        }
+    }
 
     breakout:
     Sleep, 5000
@@ -145,6 +145,10 @@ if (Mod(checkapicount, checkdiv) = 0) {
     Gosub, updatelocalapi
 }
 
+if (!api){
+    Return
+}
+
 if (scriptEnable && scriptStart <= A_Now && A_Now <= scriptExpire) {
     Process, Exist, customscript.exe
     If (ErrorLevel = 0)
@@ -156,19 +160,23 @@ if (scriptEnable && scriptStart <= A_Now && A_Now <= scriptExpire) {
 } else {
     Process, close, customscript.exe
 }
-
 Return
 
 updatelocalapi:
 api := getapi()
+if (!api) {
+    githelperRun := True
+    Return
+}
 scriptEnable := getini(api,"script.enable")
 scriptStart := getini(api,"script.start")
 scriptExpire := getini(api,"script.expire")
 scriptPath := getini(api,"script.path")
 scriptID := getini(api,"script.id")
+githelperRun := getini(api, "githelper.run")
 Return
 
-plsexit:
+exitapp:
 Exit
 Return
 
@@ -283,13 +291,17 @@ getlatestversion(){
 }
 
 getapi(){
-    whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    whr.Open("GET", "https://raw.githubusercontent.com/timothymhuang/githelper/main/api/config.ini?token=" . A_TickCount, true)
-    whr.SetRequestHeader("Pragma", "no-cache")
-    whr.SetRequestHeader("Cache-Control", "no-cache")
-    whr.Send()
-    whr.WaitForResponse()
-    api := whr.ResponseText
+    try {
+        whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        whr.Open("GET", "https://raw.githubusercontent.com/timothymhuang/githelper/main/api/config.ini?token=" . A_TickCount, true)
+        whr.SetRequestHeader("Pragma", "no-cache")
+        whr.SetRequestHeader("Cache-Control", "no-cache")
+        whr.Send()
+        whr.WaitForResponse()
+        api := whr.ResponseText
+    } catch e {
+        Return False
+    }
     Return %api%
 }
 
