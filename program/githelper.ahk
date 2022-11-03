@@ -58,7 +58,9 @@ Loop
         if(WinActive("ahk_exe GitHubDesktop.exe")){
             Send, ^1
         }
-        notification("Changes downloaded.")
+        if (status() = "current" || status() = "ahead"){
+            notification("Changes downloaded.")
+        }
     } else if(status = "ahead" || status() = "diverge") {
             if git("pull") {
                 Goto, breakout
@@ -69,7 +71,9 @@ Loop
             if(WinActive("ahk_exe GitHubDesktop.exe")){
                 Send, ^1
             }
-            notification("Changes uploaded")
+            if(status() = "current"){
+                notification("Changes uploaded")
+            }
     }
 
     Process, Exist, SLDWORKS.exe
