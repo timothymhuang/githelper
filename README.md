@@ -2,7 +2,7 @@
 # GitHub Desktop Helper
 
 This is just a small program I wrote to help my teammates with Git. 
-**:warning: Warning: Everything is hardcoded into the program. Certain tasks may happen seemingly randomly, such as fetching, sleeping computer, etc.** That being said, feel free to take the source code and modify it to your liking. Just remember to remove the auto update portion.
+**:warning: Warning: Everything is hardcoded into the program. Certain tasks may happen seemingly randomly, such as fetching, sleeping computer, etc.** That being said, feel free to take the source code and modify it to your liking (it is under the MIT license). Just remember to remove the auto update portion.
 
 ## Features
 - Git
