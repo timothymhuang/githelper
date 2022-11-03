@@ -159,6 +159,8 @@ git(action,stoperror:=0){
     RunWait, cmd.exe /c git %action% > %A_ScriptDir%\cmdgit.txt, %localrepo%, hide
     FileRead, cmdoutput, %A_ScriptDir%\cmdgit.txt
     log(action . "`n" . cmdoutput)
+    Return 0
+    
     if (action = "pull" && || cmdoutput = ""){
         notification("ERROR PULLING - Please check your WiFi connection and for conflicted files.", 3)
         Loop, 12
