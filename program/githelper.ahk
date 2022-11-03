@@ -226,7 +226,6 @@ getlatestversion(){
         endSpace := InStr(api, " ",,start)
         endPound := Instr(api, "#",,start)
         endForwardSlash := Instr(api, "/",,start)
-        endBackSlash := Instr(api, "\",,start)
         endQuote := Instr(api, "'",,start)
         endDoubleQuote := Instr(api, """",,start)
         end := Min(endSpace, endPound, endForwardSlash, endBackSlash, endQuote, endDoubleQuote)
