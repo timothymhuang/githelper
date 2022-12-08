@@ -51,10 +51,11 @@ notification(currentversion . " started in " . localrepo)
 Loop
 {
     if (githelperRun) {
-        status := status()
+        ;status := status()
         ;CoordMode, tooltip, Screen
         ;ToolTip, %lastfetch% | %lastpull% | %status% | %A_TickCount%, 0, 0
 
+        /*
         if(status = "behind"){
             if git("pull") {
                 Goto, breakout
@@ -79,6 +80,7 @@ Loop
                     notification("Changes uploaded")
                 }
         }
+        */
 
         Process, Exist, SLDWORKS.exe
         if (ErrorLevel && !solidworksopen){
